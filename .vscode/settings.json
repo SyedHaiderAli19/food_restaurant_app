@@ -1,0 +1,29 @@
+{
+  "files.exclude": {
+    ".dart_tool": true,
+    ".idea": true,
+    ".vscode": true,
+    "android": true,
+    "ios": true,
+    "linux": true,
+    "macos": true,
+    "web": true,
+    "windows": true,
+    "analysis_options.yaml": true,
+    ".metadata": true,
+    ".gitignore": true,
+    "food_restaurant_app.iml": true,
+    "pubspec.lock": true,
+    "README.md": true,
+    "auth\\.dart_tool": true,
+    "auth\\.idea": true,
+    "auth\\.gitignore": true,
+    "auth\\.metadata": true,
+    "auth\\analysis_options.yaml": true,
+    "auth\\auth.iml": true,
+    "auth\\CHANGELOG.md": true,
+    "auth\\LICENSE": true,
+    "auth\\pubspec.lock": true,
+    "auth\\README.md": true
+  }
+}
