@@ -11,6 +11,16 @@ class EmailAuth implements AuthServiceContract, SignupServiceContract {
 
   EmailAuth(this._api);
 
+  void credential({required String email, required String password}) {
+    _credential = CredentialModel(
+      email: email,
+      password: password,
+      type: AuthType.email,
+    );
+
+    
+  }
+
   @override
   Future<Result<TokenModel>> signIn() async {
     assert(_credential != null);
@@ -35,8 +45,20 @@ class EmailAuth implements AuthServiceContract, SignupServiceContract {
     required String email,
     required String name,
     required String password,
-  }) {
-    // TODO: implement signUp
-    throw UnimplementedError();
+  }) async {
+    CredentialModel credential = CredentialModel(
+      email: email,
+      type: AuthType.email,
+      name: name,
+      password: password,
+    );
+
+    var result = await _api.signUp(credential);
+
+    if (result.isError) {
+      return result.asError!;
+    }
+
+    return Result.value(TokenModel(result.asValue!.value));
   }
 }
