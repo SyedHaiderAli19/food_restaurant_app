@@ -13,14 +13,14 @@ class AuthApi implements AuthApiContract {
 
   @override
   Future<Result<String>> signIn(CredentialModel credential) async {
-    var endPoint = (baseUrl + '/auth/signin') as Uri;
+    var endPoint = ('$baseUrl/auth/signin') as Uri;
 
     return await _postCredential(endPoint, credential);
   }
 
   @override
   Future<Result<String>> signUp(CredentialModel credential) async {
-    var endPoint = (baseUrl + '/auth/signup') as Uri;
+    var endPoint = ('$baseUrl/auth/signup') as Uri;
     return await _postCredential(endPoint, credential);
   }
 
