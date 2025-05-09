@@ -6,11 +6,11 @@ import 'package:auth/src/domain/token_model.dart';
 import 'package:auth/src/infra/api/auth_api_contract.dart';
 
 class EmailAuth implements AuthServiceContract, SignupServiceContract {
-  final AuthApiContract _api;
+  final AuthApiContract api;
   CredentialModel? _credential;
   TokenModel? _tokenModel;
 
-  EmailAuth(this._api);
+  EmailAuth({required this.api});
 
   void credential({required String email, required String password}) {
     _credential = CredentialModel(
@@ -24,7 +24,7 @@ class EmailAuth implements AuthServiceContract, SignupServiceContract {
   Future<Result<TokenModel>> signIn() async {
     assert(_credential != null);
 
-    var result = await _api.signIn(_credential!);
+    var result = await api.signIn(_credential!);
 
     if (result.isError) {
       return result.asError!;
@@ -35,7 +35,7 @@ class EmailAuth implements AuthServiceContract, SignupServiceContract {
 
   @override
   Future<Result<bool>> signOut(TokenModel token) async {
-    return await _api.signOut(_tokenModel!);
+    return await api.signOut(_tokenModel!);
   }
 
   @override
@@ -51,7 +51,7 @@ class EmailAuth implements AuthServiceContract, SignupServiceContract {
       password: password,
     );
 
-    var result = await _api.signUp(credential);
+    var result = await api.signUp(credential);
 
     if (result.isError) {
       return result.asError!;
