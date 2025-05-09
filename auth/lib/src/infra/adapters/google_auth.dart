@@ -11,7 +11,7 @@ class GoogleAuth implements AuthServiceContract {
   GoogleSignInAccount? _currentUser;
 
   GoogleAuth(this._authApi, [GoogleSignIn? googleSignIn])
-    : this._googleSignIn =
+    : _googleSignIn =
           googleSignIn ?? GoogleSignIn(scopes: ['email', 'profile']);
 
   @override

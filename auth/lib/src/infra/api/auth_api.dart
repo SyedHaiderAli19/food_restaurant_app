@@ -29,7 +29,7 @@ class AuthApi implements AuthApiContract {
     Uri endPoint,
     CredentialModel credential,
   ) async {
-    var res = await _client.post(
+    final res = await _client.post(
       endPoint,
       body: jsonEncode(Mapper.toJson(credential)),
       headers: {"Content-type": "application/json"},
@@ -38,6 +38,7 @@ class AuthApi implements AuthApiContract {
     if (res.statusCode != 200) {
       return Result.error('Server Error');
     }
+    
     final json = jsonDecode(res.body);
 
     return json['auth_token'] != null
