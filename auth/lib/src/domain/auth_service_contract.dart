@@ -3,5 +3,5 @@ import 'package:async/async.dart';
 
 abstract class AuthServiceContract {
   Future<Result<TokenModel>> signIn();
-  Future<void> signOut();
+  Future<Result<bool>> signOut(TokenModel token);
 }

@@ -38,8 +38,12 @@ class GoogleAuth implements AuthServiceContract {
   }
 
   @override
-  Future<void> signOut() async {
-    _googleSignIn!.disconnect();
+  Future<Result<bool>> signOut(TokenModel token) async {
+    Result<bool> res = await _authApi.signOut(token);
+    if (res.asValue!.value) {
+      _googleSignIn!.disconnect();
+    }
+    return res;
   }
 
   _handleGoogleSignIn() async {

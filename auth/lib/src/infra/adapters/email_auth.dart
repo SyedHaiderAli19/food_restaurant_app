@@ -8,6 +8,7 @@ import 'package:auth/src/infra/api/auth_api_contract.dart';
 class EmailAuth implements AuthServiceContract, SignupServiceContract {
   final AuthApiContract _api;
   CredentialModel? _credential;
+  TokenModel? _tokenModel;
 
   EmailAuth(this._api);
 
@@ -17,8 +18,6 @@ class EmailAuth implements AuthServiceContract, SignupServiceContract {
       password: password,
       type: AuthType.email,
     );
-
-    
   }
 
   @override
@@ -35,9 +34,8 @@ class EmailAuth implements AuthServiceContract, SignupServiceContract {
   }
 
   @override
-  Future<void> signOut() {
-    // TODO: implement signOut
-    throw UnimplementedError();
+  Future<Result<bool>> signOut(TokenModel token) async {
+    return await _api.signOut(_tokenModel!);
   }
 
   @override
