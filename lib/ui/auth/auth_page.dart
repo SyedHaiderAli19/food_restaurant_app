@@ -13,6 +13,7 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
+  final PageController _controller = PageController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +55,8 @@ class _AuthPageState extends State<AuthPage> {
   _buildUI() => Expanded(
     child: PageView(
       physics: NeverScrollableScrollPhysics(),
-      children: [_signIn()],
+      controller: _controller,
+      children: [_signIn(), _signUp()],
     ),
   );
 
@@ -98,7 +100,66 @@ class _AuthPageState extends State<AuthPage> {
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
-                recognizer: TapGestureRecognizer()..onTap = () {},
+                recognizer:
+                    TapGestureRecognizer()
+                      ..onTap = () {
+                        _controller.nextPage(
+                          duration: Duration(milliseconds: 1000),
+                          curve: Curves.elasticOut,
+                        );
+                      },
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+
+  _signUp() => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 24),
+    child: Column(
+      children: [
+        CustomTextField(
+          hint: 'Username',
+          fontSize: 18,
+          fontWeight: FontWeight.normal,
+          onChanged: (val) {},
+        ),
+        SizedBox(height: 30),
+        ..._emailAndPassword(),
+        SizedBox(height: 30),
+        CustomTextButton(
+          text: 'Sign Up',
+          size: Size(double.infinity, 54),
+          onPressed: () {},
+        ),
+        SizedBox(height: 30),
+
+        RichText(
+          text: TextSpan(
+            text: "Already have an account?",
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.normal,
+            ),
+            children: [
+              TextSpan(
+                text: "Sign In",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                recognizer:
+                    TapGestureRecognizer()
+                      ..onTap = () {
+                        _controller.previousPage(
+                          duration: Duration(milliseconds: 1000),
+                          curve: Curves.elasticOut,
+                        );
+                      },
               ),
             ],
           ),
