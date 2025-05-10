@@ -52,7 +52,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     //fetch the token from the local storage
     final token = await localStore.fetch();
 
-    final result = await event.authService.signOut(token);
+    final result = await event.authService.signOut(token!);
     if (result.asValue!.value) {
       //if the result value is present and is returned true incase of successful signout, then
       localStore.delete(
