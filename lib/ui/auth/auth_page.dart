@@ -1,12 +1,23 @@
+import 'package:auth/src/domain/signup_service_contract.dart';
+import 'package:auth/src/infra/managers/auth_manager.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:food_restaurant_app/state_management/auth/auth_bloc.dart';
+import 'package:food_restaurant_app/state_management/auth/auth_state.dart';
 import 'package:food_restaurant_app/ui/widgets/custom_outlined_button.dart';
 import 'package:food_restaurant_app/ui/widgets/custom_text_button.dart';
 import 'package:food_restaurant_app/ui/widgets/custom_text_field.dart';
 
 class AuthPage extends StatefulWidget {
-  const AuthPage({super.key});
+  final AuthManager manager;
+  final SignupServiceContract signupService;
+  const AuthPage({
+    super.key,
+    required this.manager,
+    required this.signupService,
+  });
 
   @override
   State<AuthPage> createState() => _AuthPageState();
@@ -14,6 +25,9 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
   final PageController _controller = PageController();
+  String _userName = '';
+  String _email = '';
+  String _password = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +41,30 @@ class _AuthPageState extends State<AuthPage> {
               child: _buildLogo(),
             ),
             SizedBox(height: 50),
-            _buildUI(),
+            BlocConsumer<AuthBloc, AuthState>(
+              builder: (_, state) {
+                return _buildUI();
+              },
+              listener: (context, state) {
+                if (state is LoadingState) {
+                  _showLoader();
+                }
+
+                if (state is ErrorState) {
+                  //Incase of error state
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        state.errorMessage,
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                  );
+                }
+
+                _hideLoader();
+              },
+            ),
           ],
         ),
       ),
@@ -124,7 +161,9 @@ class _AuthPageState extends State<AuthPage> {
           hint: 'Username',
           fontSize: 18,
           fontWeight: FontWeight.normal,
-          onChanged: (val) {},
+          onChanged: (val) {
+            _userName = val;
+          },
         ),
         SizedBox(height: 30),
         ..._emailAndPassword(),
@@ -173,14 +212,38 @@ class _AuthPageState extends State<AuthPage> {
       hint: 'Email',
       fontSize: 18.0,
       fontWeight: FontWeight.normal,
-      onChanged: (val) {},
+      onChanged: (val) {
+        _email = val;
+      },
     ),
     SizedBox(height: 30),
     CustomTextField(
       hint: 'Password',
       fontSize: 18.0,
       fontWeight: FontWeight.normal,
-      onChanged: (val) {},
+      onChanged: (val) {
+        _password = val;
+      },
     ),
   ];
+
+  _showLoader() {
+    AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: Center(
+        child: CircularProgressIndicator(backgroundColor: Colors.white70),
+      ),
+    );
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => alert,
+    );
+  }
+
+  _hideLoader() {
+    Navigator.of(context, rootNavigator: true).pop();
+  }
 }

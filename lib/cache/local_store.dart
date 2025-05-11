@@ -6,7 +6,8 @@ const CACHED_TOKEN = 'CACHED_TOKEN';
 
 class LocalStore implements ILocalStore {
   final SharedPreferences sharedPreferences;
-  LocalStore({required this.sharedPreferences});
+
+  LocalStore(this.sharedPreferences);
 
   @override
   delete({required TokenModel token}) {
