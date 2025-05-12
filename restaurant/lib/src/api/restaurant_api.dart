@@ -63,9 +63,27 @@ class RestaurantApi implements IRestaurantApi {
   }
 
   @override
-  Future<MenuModel> getRestaurantMenu({required String restaurantId}) {
-    // TODO: implement getRestaurantMenu
-    throw UnimplementedError();
+  Future<List<MenuModel>> getRestaurantMenu({
+    required String restaurantId,
+  }) async {
+    final Uri endPoint = Uri.parse(
+      "$baseUrl/restaurant/menu/restaurantId=$restaurantId",
+    );
+    final http.Response response = await httpClient.get(endPoint);
+
+    if (response.statusCode != 200) {
+      return [];
+    }
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (json['menu'] == null) {
+      return [];
+    }
+
+    final List<MenuModel> menus = json['menu'];
+
+    return menus.map<MenuModel>((element) => MenuModel.fromJson(json)).toList();
   }
 
   _parseRestaurantsJson(http.Response response) {

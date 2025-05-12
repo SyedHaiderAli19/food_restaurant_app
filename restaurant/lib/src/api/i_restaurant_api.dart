@@ -15,5 +15,5 @@ abstract class IRestaurantApi {
 
   Future<RestaurantModel?> getRestaurant({required String id});
 
-  Future<MenuModel> getRestaurantMenu({required String restaurantId});
+  Future<List<MenuModel>> getRestaurantMenu({required String restaurantId});
 }
