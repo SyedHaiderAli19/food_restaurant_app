@@ -41,7 +41,6 @@
     "restaurant/README.md": true,
     "restaurant/restaurant.iml": true,
     ".git": true,
-    "lib": true,
     "common/.dart_tool": true,
     "common/.gitignore": true,
     "common/.idea": true,
@@ -51,7 +50,9 @@
     "common/common.iml": true,
     "common/LICENSE": true,
     "common/pubspec.lock": true,
-    "common/README.md": true
+    "common/README.md": true,
+    "auth": true,
+    "assets": true
   },
   "editor.dragAndDrop": false,
   "scm.compactFolders": true,

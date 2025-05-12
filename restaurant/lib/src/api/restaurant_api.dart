@@ -113,9 +113,9 @@ class RestaurantApi implements IRestaurantApi {
 
       return PageModel(
         currentPage: json['metadata']['page'],
-        limit: json['metadata']['limit'],
+        totalPages: json['metadata']['total_pages'],
         restaurants: restaurants,
-      );
+      ); 
     } catch (e) {
       print(e.toString());
       return null;
