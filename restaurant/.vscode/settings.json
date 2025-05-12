@@ -10,6 +10,17 @@
     "LICENSE": true,
     "pubspec.lock": true,
     "README.md": true,
-    "restaurant.iml": true
+    "restaurant.iml": true,
+    "common/.dart_tool": true,
+    "common/.gitignore": true,
+    "common/.idea": true,
+    "common/.metadata": true,
+    "common/analysis_options.yaml": true,
+    "common/CHANGELOG.md": true,
+    "common/common.iml": true,
+    "common/LICENSE": true,
+    "common/pubspec.lock": true,
+    "common/README.md": true,
+    "build": true
   }
 }

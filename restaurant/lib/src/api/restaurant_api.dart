@@ -1,63 +1,71 @@
 import 'dart:convert';
+import 'package:common/common.dart';
 import 'package:restaurant/src/api/i_restaurant_api.dart';
 import 'package:restaurant/src/domain/location_model.dart';
 import 'package:restaurant/src/domain/menu_model.dart';
+import 'package:restaurant/src/domain/page_model.dart';
 import 'package:restaurant/src/domain/restaurant_model.dart';
-import 'package:http/http.dart' as http;
 
 class RestaurantApi implements IRestaurantApi {
-  final http.Client httpClient;
+  final IHttpClient httpClient;
   final String baseUrl;
 
   RestaurantApi({required this.baseUrl, required this.httpClient});
 
   @override
-  Future<List<RestaurantModel>> findRestaurants({
+  Future<PageModel?> findRestaurants({
     required int pageNo,
+    required int limit,
     required String searchTerm,
   }) async {
     final Uri endPoint = Uri.parse(
-      "$baseUrl/search/page=$pageNo&term=$searchTerm",
+      "$baseUrl/search/page=$pageNo&limit=$limit&term=$searchTerm",
     );
 
-    final http.Response response = await httpClient.get(endPoint);
+    final HttpResult result = await httpClient.get(endPoint);
 
-    return _parseRestaurantsJson(response);
+    return _parseRestaurantsJson(result);
   }
 
   @override
-  Future<List<RestaurantModel>> getAllRestaurants({required int pageNo}) async {
-    final Uri endPoint = Uri.parse("$baseUrl/restaurants/page=$pageNo");
-    final http.Response response = await httpClient.get(endPoint);
+  Future<PageModel?> getAllRestaurants({
+    required int pageNo,
+    required int limit,
+  }) async {
+    final Uri endPoint = Uri.parse(
+      "$baseUrl/restaurants/page=$pageNo&limit=$limit",
+    );
+    final result = await httpClient.get(endPoint);
 
-    return _parseRestaurantsJson(response);
+    return _parseRestaurantsJson(result);
   }
 
   @override
   Future<RestaurantModel?> getRestaurant({required String id}) async {
     final Uri endPoint = Uri.parse("$baseUrl/restaurants/$id");
-    final http.Response response = await httpClient.get(endPoint);
+    final result = await httpClient.get(endPoint);
 
-    if (response.statusCode != 200) {
+    if (result.status == Status.failure) {
       return null;
     }
 
-    final json = jsonDecode(response.body);
+    final json = jsonDecode(result.data);
 
     return RestaurantModel.fromJson(json);
   }
 
   @override
-  Future<List<RestaurantModel>> getRestaurantByLocation({
+  Future<PageModel?> getRestaurantByLocation({
     required int pageNo,
+    required int limit,
     required LocationModel location,
   }) async {
     final Uri endPoint = Uri.parse(
-      "$baseUrl/restaurants/page=$pageNo&longitude=${location.longitude}&latitude=${location.latitude}",
+      "$baseUrl/restaurants/page=$pageNo&limit=$limit&longitude=${location.longitude}&latitude=${location.latitude}",
     );
-    final response = await httpClient.get(endPoint);
+    final result = await httpClient.get(endPoint);
 
-    return _parseRestaurantsJson(response);
+    return _parseRestaurantsJson(result);
   }
 
   @override
@@ -67,13 +75,13 @@ class RestaurantApi implements IRestaurantApi {
     final Uri endPoint = Uri.parse(
       "$baseUrl/restaurant/menu/restaurantId=$restaurantId",
     );
-    final http.Response response = await httpClient.get(endPoint);
+    final HttpResult result = await httpClient.get(endPoint);
     try {
-      if (response.statusCode != 200) {
+      if (result.status == Status.failure) {
         return <MenuModel>[];
       }
 
-      final Map<String, dynamic> json = jsonDecode(response.body);
+      final Map<String, dynamic> json = jsonDecode(result.data);
 
       if (json['menu'] == null) {
         return <MenuModel>[];
@@ -92,20 +100,25 @@ class RestaurantApi implements IRestaurantApi {
     }
   }
 
-  _parseRestaurantsJson(http.Response response) {
+  PageModel? _parseRestaurantsJson(HttpResult result) {
     try {
-      if (response.statusCode != 200) {
-        return <RestaurantModel>[];
+      if (result.status == Status.failure) {
+        return null;
       }
 
-      final Map<String, dynamic> json = jsonDecode(response.body);
+      final Map<String, dynamic> json = jsonDecode(result.data);
 
-      return json['restaurants'] != null
-          ? _restaurantsFromJson(json)
-          : <RestaurantModel>[];
+      final List<RestaurantModel> restaurants =
+          json['restaurants'] != null ? _restaurantsFromJson(json) : [];
+
+      return PageModel(
+        currentPage: json['metadata']['page'],
+        limit: json['metadata']['limit'],
+        restaurants: restaurants,
+      );
     } catch (e) {
       print(e.toString());
-      return <RestaurantModel>[];
+      return null;
     }
   }
 
