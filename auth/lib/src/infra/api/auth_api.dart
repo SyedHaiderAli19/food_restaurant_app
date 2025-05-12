@@ -7,10 +7,10 @@ import 'package:auth/src/domain/credential_model.dart';
 import 'package:auth/src/infra/api/auth_api_contract.dart';
 
 class AuthApi implements AuthApiContract {
-  final http.Client _client;
-  String baseUrl;
+  final http.Client client;
+  final String baseUrl;
 
-  AuthApi(this.baseUrl, this._client);
+  AuthApi({required this.baseUrl, required this.client});
 
   @override
   Future<Result<String>> signIn(CredentialModel credential) async {
@@ -29,7 +29,7 @@ class AuthApi implements AuthApiContract {
     Uri endPoint,
     CredentialModel credential,
   ) async {
-    final res = await _client.post(
+    final res = await client.post(
       endPoint,
       body: jsonEncode(Mapper.toJson(credential)),
       headers: {"Content-type": "application/json"},
@@ -54,7 +54,7 @@ class AuthApi implements AuthApiContract {
       "Content-type": "application/json",
       "Authorization": token.value,
     };
-    var response = await _client.post(endPoint, headers: headers);
+    var response = await client.post(endPoint, headers: headers);
 
     if (response.statusCode != 200) {
       return Result.value(false);

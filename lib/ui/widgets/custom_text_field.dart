@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   final String hint;
+  final TextInputType keyboardType;
+  final bool isPassword;
   final double fontSize;
   final FontWeight fontWeight;
   final void Function(String val) onChanged;
   const CustomTextField({
     super.key,
     required this.hint,
+    required this.keyboardType,
+    required this.isPassword,
     required this.fontSize,
     required this.fontWeight,
     required this.onChanged,
@@ -33,6 +37,8 @@ class CustomTextField extends StatelessWidget {
         ],
       ),
       child: TextField(
+        keyboardType: keyboardType,
+        obscureText: isPassword,
         onChanged: onChanged,
         cursorColor: Colors.black,
         style: Theme.of(context).textTheme.displaySmall!.copyWith(

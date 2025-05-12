@@ -20,7 +20,7 @@ void main() {
   setUp(() {
     // set up the test case
     client = http.Client();
-    sut = AuthApi(baseUrl, client);
+    sut = AuthApi(baseUrl: baseUrl, client: client);
   });
 
   group('signin', () {
