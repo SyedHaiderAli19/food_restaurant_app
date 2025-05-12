@@ -17,9 +17,14 @@ class RestaurantApi implements IRestaurantApi {
   Future<List<RestaurantModel>> findRestaurants({
     required int pageNo,
     required String searchTerm,
-  }) {
-    // TODO: implement findRestaurants
-    throw UnimplementedError();
+  }) async {
+    final Uri endPoint = Uri.parse(
+      "$baseUrl/search/page=$pageNo&term=$searchTerm",
+    );
+
+    final http.Response response = await httpClient.get(endPoint);
+
+    return _parseRestaurantsJson(response);
   }
 
   @override
@@ -72,7 +77,9 @@ class RestaurantApi implements IRestaurantApi {
       final Map<String, dynamic> json = jsonDecode(response.body);
 
       return json['restaurants'] != null ? _restaurantsFromJson(json) : [];
-    } catch (e) {}
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   List<RestaurantModel> _restaurantsFromJson(Map<String, dynamic> json) {
