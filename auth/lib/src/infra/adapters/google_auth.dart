@@ -12,7 +12,12 @@ class GoogleAuth implements AuthServiceContract {
 
   GoogleAuth(this._authApi, [GoogleSignIn? googleSignIn])
     : _googleSignIn =
-          googleSignIn ?? GoogleSignIn(scopes: ['email', 'profile']);
+          googleSignIn ??
+          GoogleSignIn(
+            scopes: ['email', 'profile'],
+            clientId:
+                '802202887550-v1ggra2kmlmn1f56aorb1gmkt8phd4i2.apps.googleusercontent.com',
+          );
 
   @override
   Future<Result<TokenModel>> signIn() async {

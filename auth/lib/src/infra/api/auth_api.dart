@@ -36,9 +36,10 @@ class AuthApi implements AuthApiContract {
     );
 
     if (res.statusCode != 200) {
-      return Result.error('Server Error');
+      Map map = jsonDecode(res.body);
+      return Result.error(_transformErrorArrayToString(map));
     }
-    
+
     final json = jsonDecode(res.body);
 
     return json['auth_token'] != null
@@ -59,5 +60,18 @@ class AuthApi implements AuthApiContract {
       return Result.value(false);
     }
     return Result.value(true);
+  }
+
+  _transformErrorArrayToString(Map map) {
+    final contents = map['error'] ?? map['errors'];
+    if (contents is String) {
+      return contents;
+    }
+
+    final errorString = contents.fold(
+      '',
+      (prev, elem) => prev + elem.values.first + '\n',
+    );
+    return errorString.trim();
   }
 }

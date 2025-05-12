@@ -4,7 +4,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:food_restaurant_app/models/user_model.dart';
 import 'package:food_restaurant_app/state_management/auth/auth_bloc.dart';
+import 'package:food_restaurant_app/state_management/auth/auth_event.dart';
 import 'package:food_restaurant_app/state_management/auth/auth_state.dart';
 import 'package:food_restaurant_app/ui/widgets/custom_outlined_button.dart';
 import 'package:food_restaurant_app/ui/widgets/custom_text_button.dart';
@@ -106,11 +108,24 @@ class _AuthPageState extends State<AuthPage> {
         CustomTextButton(
           text: 'Sign In',
           size: Size(double.infinity, 54),
-          onPressed: () {},
+          onPressed: () {
+            BlocProvider.of<AuthBloc>(context).add(
+              SignInEvent(
+                authService: widget.manager.email(
+                  email: _email,
+                  password: _password,
+                ),
+              ),
+            );
+          },
         ),
         SizedBox(height: 30),
         CustomOutlinedButton(
-          onPressed: () {},
+          onPressed: () {
+            BlocProvider.of<AuthBloc>(
+              context,
+            ).add(SignInEvent(authService: widget.manager.google));
+          },
           text: 'Sign In With Google',
           size: Size(double.infinity, 50),
           icon: SvgPicture.asset(
@@ -171,8 +186,19 @@ class _AuthPageState extends State<AuthPage> {
         CustomTextButton(
           text: 'Sign Up',
           size: Size(double.infinity, 54),
-          onPressed: () {},
+          onPressed: () {
+            final user = UserModel(
+              name: _userName,
+              email: _email,
+              password: _password,
+            );
+
+            BlocProvider.of<AuthBloc>(context).add(
+              SignUpEvent(signUpService: widget.signupService, userModel: user),
+            );
+          },
         ),
+
         SizedBox(height: 30),
 
         RichText(

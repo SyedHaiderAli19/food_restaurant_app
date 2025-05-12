@@ -27,7 +27,7 @@ class CompositionRoot {
     AuthBloc _authBloc = AuthBloc(localStore: _localStore);
     SignupServiceContract _signUpService = SignUpService(api: _api);
 
-    return BlocProvider(
+    return BlocProvider<AuthBloc>(
       create: (BuildContext context) => _authBloc,
       child: AuthPage(manager: _manager, signupService: _signUpService),
     );
