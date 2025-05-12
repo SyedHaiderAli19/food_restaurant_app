@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:restaurant/src/api/i_restaurant_api.dart';
 import 'package:restaurant/src/domain/location_model.dart';
 import 'package:restaurant/src/domain/menu_model.dart';
@@ -70,41 +68,57 @@ class RestaurantApi implements IRestaurantApi {
       "$baseUrl/restaurant/menu/restaurantId=$restaurantId",
     );
     final http.Response response = await httpClient.get(endPoint);
+    try {
+      if (response.statusCode != 200) {
+        return <MenuModel>[];
+      }
 
-    if (response.statusCode != 200) {
-      return [];
+      final Map<String, dynamic> json = jsonDecode(response.body);
+
+      if (json['menu'] == null) {
+        return <MenuModel>[];
+      }
+
+      final List<dynamic> rawMenus = json['menu'];
+
+      final List<MenuModel> menus =
+          rawMenus
+              .map<MenuModel>((element) => MenuModel.fromJson(element))
+              .toList();
+      return menus;
+    } catch (e) {
+      print(e.toString());
+      return <MenuModel>[];
     }
-
-    final Map<String, dynamic> json = jsonDecode(response.body);
-
-    if (json['menu'] == null) {
-      return [];
-    }
-
-    final List<MenuModel> menus = json['menu'];
-
-    return menus.map<MenuModel>((element) => MenuModel.fromJson(json)).toList();
   }
 
   _parseRestaurantsJson(http.Response response) {
     try {
       if (response.statusCode != 200) {
-        return [];
+        return <RestaurantModel>[];
       }
 
       final Map<String, dynamic> json = jsonDecode(response.body);
 
-      return json['restaurants'] != null ? _restaurantsFromJson(json) : [];
+      return json['restaurants'] != null
+          ? _restaurantsFromJson(json)
+          : <RestaurantModel>[];
     } catch (e) {
       print(e.toString());
+      return <RestaurantModel>[];
     }
   }
 
   List<RestaurantModel> _restaurantsFromJson(Map<String, dynamic> json) {
-    final List<RestaurantModel> restaurants = json['restaurants'];
+    final List<dynamic> rawRestaurantsData = json['restaurants'];
 
-    return restaurants
-        .map<RestaurantModel>((element) => RestaurantModel.fromJson(json))
-        .toList();
+    final List<RestaurantModel> restaurants =
+        rawRestaurantsData
+            .map<RestaurantModel>(
+              (element) => RestaurantModel.fromJson(element),
+            )
+            .toList();
+
+    return restaurants;
   }
 }
