@@ -48,10 +48,13 @@ class RestaurantApi implements IRestaurantApi {
   Future<List<RestaurantModel>> getRestaurantByLocation({
     required int pageNo,
     required LocationModel location,
-  }) {
+  }) async {
     final Uri endPoint = Uri.parse(
-      "$baseUrl/restaurants/location=$location/page=$pageNo",
+      "$baseUrl/restaurants/page=$pageNo&longitude=${location.longitude}&latitude=${location.latitude}",
     );
+    final response = await httpClient.get(endPoint);
+
+    return _parseRestaurantsJson(response);
   }
 
   @override
