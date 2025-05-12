@@ -13,7 +13,7 @@ abstract class IRestaurantApi {
     required String searchTerm,
   });
 
-  Future<RestaurantModel> getRestaurant({required String id});
+  Future<RestaurantModel?> getRestaurant({required String id});
 
   Future<MenuModel> getRestaurantMenu({required String restaurantId});
 }

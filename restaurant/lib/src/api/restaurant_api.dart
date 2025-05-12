@@ -31,9 +31,17 @@ class RestaurantApi implements IRestaurantApi {
   }
 
   @override
-  Future<RestaurantModel> getRestaurant({required String id}) {
-    // TODO: implement getRestaurant
-    throw UnimplementedError();
+  Future<RestaurantModel?> getRestaurant({required String id}) async {
+    final Uri endPoint = Uri.parse("$baseUrl/restaurants/$id");
+    final http.Response response = await httpClient.get(endPoint);
+
+    if (response.statusCode != 200) {
+      return null;
+    }
+
+    final json = jsonDecode(response.body);
+
+    return RestaurantModel.fromJson(json);
   }
 
   @override
@@ -41,8 +49,9 @@ class RestaurantApi implements IRestaurantApi {
     required int pageNo,
     required LocationModel location,
   }) {
-    // TODO: implement getRestaurantByLocation
-    throw UnimplementedError();
+    final Uri endPoint = Uri.parse(
+      "$baseUrl/restaurants/location=$location/page=$pageNo",
+    );
   }
 
   @override
