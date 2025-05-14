@@ -8,7 +8,8 @@ import 'package:food_restaurant_app/state_management/auth/auth_bloc.dart';
 import 'package:food_restaurant_app/state_management/helpers/header_bloc.dart';
 import 'package:food_restaurant_app/state_management/restaurant/restaurant_bloc.dart';
 import 'package:food_restaurant_app/ui/pages/auth/auth_page.dart';
-import 'package:food_restaurant_app/ui/pages/restaurant/restaurant_list_page.dart';
+import 'package:food_restaurant_app/ui/pages/home/i_home_page_adapter.dart';
+import 'package:food_restaurant_app/ui/pages/home/restaurant_list_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -38,11 +39,13 @@ class CompositionRoot {
   }
 
   static Widget composeHomeUI() {
-    FakeRestaurantApi fakeApi = FakeRestaurantApi(20);
+    FakeRestaurantApi fakeApi = FakeRestaurantApi(50);
     RestaurantBloc restaurantBloc = RestaurantBloc(
       api: fakeApi,
-      defaultPageSize: 5,
+      defaultPageSize: 20,
     );
+
+    IHomePageAdapter adapter = HomePageAdapter(restaurantBloc: restaurantBloc);
 
     return MultiBlocProvider(
       providers: [
@@ -53,7 +56,7 @@ class CompositionRoot {
           create: (BuildContext context) => HeaderBloc(),
         ),
       ],
-      child: RestaurantListPage(),
+      child: RestaurantListPage(adapter: adapter),
     );
   }
 }

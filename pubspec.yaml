@@ -39,18 +39,24 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   flutter_svg: ^2.1.0
   google_fonts: ^6.2.1
-  transparent_image: ^2.0.1
   http: ^1.4.0
   restaurant:
     path: ./restaurant
   shared_preferences: ^2.5.3
+  transparent_image: ^2.0.1
 
 dev_dependencies:
   faker: ^2.2.0
-  mockito: ^5.4.6
+  flutter_launcher_icons: ^0.14.3
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
+  mockito: ^5.4.6
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.svg"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -175,6 +175,7 @@ class _AuthPageState extends State<AuthPage> {
         CustomTextField(
           height: 50,
           hint: 'Username',
+          inputAction: TextInputAction.next,
           keyboardType: TextInputType.name,
           isPassword: false,
           fontSize: 18,
@@ -182,6 +183,7 @@ class _AuthPageState extends State<AuthPage> {
           onChanged: (val) {
             _userName = val;
           },
+          onSubmitted: (query) {},
         ),
         SizedBox(height: 30),
         ..._emailAndPassword(),
@@ -240,6 +242,7 @@ class _AuthPageState extends State<AuthPage> {
     CustomTextField(
       height: 50,
       hint: 'Email',
+      inputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
       isPassword: false,
       fontSize: 18.0,
@@ -247,6 +250,7 @@ class _AuthPageState extends State<AuthPage> {
       onChanged: (val) {
         _email = val;
       },
+      onSubmitted: (query) {},
     ),
     SizedBox(height: 30),
     CustomTextField(
@@ -254,11 +258,13 @@ class _AuthPageState extends State<AuthPage> {
       isPassword: true,
       keyboardType: TextInputType.text,
       hint: 'Password',
+      inputAction: TextInputAction.go,
       fontSize: 18.0,
       fontWeight: FontWeight.normal,
       onChanged: (val) {
         _password = val;
       },
+      onSubmitted: (query) {},
     ),
   ];
 

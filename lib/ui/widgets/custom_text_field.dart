@@ -7,7 +7,9 @@ class CustomTextField extends StatelessWidget {
   final double fontSize;
   final FontWeight fontWeight;
   final double height;
+  final TextInputAction inputAction;
   final void Function(String val) onChanged;
+  final void Function(String query) onSubmitted;
   const CustomTextField({
     super.key,
     required this.hint,
@@ -16,7 +18,9 @@ class CustomTextField extends StatelessWidget {
     required this.fontSize,
     required this.fontWeight,
     required this.height,
+    required this.inputAction,
     required this.onChanged,
+    required this.onSubmitted,
   });
 
   final _border = const OutlineInputBorder(
@@ -39,6 +43,8 @@ class CustomTextField extends StatelessWidget {
         ],
       ),
       child: TextField(
+        textInputAction: inputAction,
+        onSubmitted: onSubmitted,
         keyboardType: keyboardType,
         obscureText: isPassword,
         onChanged: onChanged,

@@ -6,13 +6,16 @@ import 'package:food_restaurant_app/state_management/helpers/header_event.dart';
 import 'package:food_restaurant_app/state_management/restaurant/restaurant_bloc.dart';
 import 'package:food_restaurant_app/state_management/restaurant/restaurant_event.dart';
 import 'package:food_restaurant_app/state_management/restaurant/restaurant_state.dart';
+import 'package:food_restaurant_app/ui/pages/home/i_home_page_adapter.dart';
 import 'package:food_restaurant_app/ui/widgets/custom_text_field.dart';
 import 'package:food_restaurant_app/ui/widgets/restaurant_list_item.dart';
+import 'package:food_restaurant_app/utils/utils.dart';
 import 'package:restaurant/restaurant.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class RestaurantListPage extends StatefulWidget {
-  const RestaurantListPage({super.key});
+  final IHomePageAdapter adapter;
+  const RestaurantListPage({super.key, required this.adapter});
 
   @override
   State<RestaurantListPage> createState() => _RestaurantListPageState();
@@ -72,45 +75,49 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         ],
       ),
       extendBodyBehindAppBar: true,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Align(child: header(), alignment: Alignment.topCenter),
+      resizeToAvoidBottomInset: false,
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Align(child: header(), alignment: Alignment.topCenter),
 
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: FractionallySizedBox(
-              heightFactor: 0.75,
-              child: BlocConsumer<RestaurantBloc, RestaurantState>(
-                builder: (BuildContext context, RestaurantState state) {
-                  if (state is PageLoadedState) {
-                    currentState = state;
-                    restaurants.addAll(state.restaurants);
-                    updateHeader();
-                  }
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: FractionallySizedBox(
+                heightFactor: 0.75,
+                child: BlocConsumer<RestaurantBloc, RestaurantState>(
+                  builder: (BuildContext context, RestaurantState state) {
+                    if (state is PageLoadedState) {
+                      currentState = state;
+                      restaurants.addAll(state.restaurants);
+                      updateHeader();
+                    }
 
-                  if (currentState == null) {
-                    return Center(child: CircularProgressIndicator());
-                  }
+                    if (currentState == null) {
+                      return Center(child: CircularProgressIndicator());
+                    }
 
-                  return buildListOfRestaurants();
-                },
-                listener: (BuildContext context, RestaurantState state) {
-                  if (state is ErrorState) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          state.errorMessage,
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                    return buildListOfRestaurants();
+                  },
+                  listener: (BuildContext context, RestaurantState state) {
+                    if (state is ErrorState) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            state.errorMessage,
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
                         ),
-                      ),
-                    );
-                  }
-                },
+                      );
+                    }
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -131,11 +138,16 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
             child: CustomTextField(
               hint: 'Find Restaurants',
               keyboardType: TextInputType.text,
+              inputAction: TextInputAction.search,
               isPassword: false,
               fontSize: 14,
               fontWeight: FontWeight.normal,
               height: 48,
               onChanged: (val) {},
+              onSubmitted: (query) {
+                if (query.isEmpty) return;
+                widget.adapter.onSearchQuery(context: context, query: query);
+              },
             ),
           ),
         ),
@@ -216,15 +228,4 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
       ),
     );
   }
-
-  bottomLoader() => Container(
-    alignment: Alignment.center,
-    child: Center(
-      child: SizedBox(
-        width: 33,
-        height: 33,
-        child: CircularProgressIndicator(strokeWidth: 1.5),
-      ),
-    ),
-  );
 }
