@@ -3,6 +3,7 @@ import 'package:food_restaurant_app/composition_root.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   CompositionRoot.configure();
   runApp(const MyApp());
 }
@@ -10,7 +11,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.montserratTextTheme(Theme.of(context).textTheme),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: CompositionRoot.composeAuthUI(),
+      home: CompositionRoot.composeHomeUI(),
     );
   }
 }

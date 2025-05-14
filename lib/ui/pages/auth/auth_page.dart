@@ -173,6 +173,7 @@ class _AuthPageState extends State<AuthPage> {
     child: Column(
       children: [
         CustomTextField(
+          height: 50,
           hint: 'Username',
           keyboardType: TextInputType.name,
           isPassword: false,
@@ -237,6 +238,7 @@ class _AuthPageState extends State<AuthPage> {
 
   List<Widget> _emailAndPassword() => [
     CustomTextField(
+      height: 50,
       hint: 'Email',
       keyboardType: TextInputType.emailAddress,
       isPassword: false,
@@ -248,6 +250,7 @@ class _AuthPageState extends State<AuthPage> {
     ),
     SizedBox(height: 30),
     CustomTextField(
+      height: 50,
       isPassword: true,
       keyboardType: TextInputType.text,
       hint: 'Password',

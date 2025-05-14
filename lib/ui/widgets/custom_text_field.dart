@@ -6,6 +6,7 @@ class CustomTextField extends StatelessWidget {
   final bool isPassword;
   final double fontSize;
   final FontWeight fontWeight;
+  final double height;
   final void Function(String val) onChanged;
   const CustomTextField({
     super.key,
@@ -14,6 +15,7 @@ class CustomTextField extends StatelessWidget {
     required this.isPassword,
     required this.fontSize,
     required this.fontWeight,
+    required this.height,
     required this.onChanged,
   });
 
@@ -25,7 +27,7 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 54,
+      height: height,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [

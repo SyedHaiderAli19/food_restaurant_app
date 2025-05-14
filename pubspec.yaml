@@ -39,6 +39,7 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   flutter_svg: ^2.1.0
   google_fonts: ^6.2.1
+  transparent_image: ^2.0.1
   http: ^1.4.0
   restaurant:
     path: ./restaurant
@@ -63,6 +64,7 @@ flutter:
   assets:
     - assets/google-icon.svg
     - assets/logo.svg
+    - assets/loading.gif
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see

@@ -74,6 +74,7 @@ class FakeRestaurantApi implements IRestaurantApi {
     required int pageNo,
   }) async {
     await Future.delayed(Duration(seconds: 2));
+    Future.delayed(Duration(seconds: 2));
     return _paginatedRestaurants(pageNo, limit);
   }
 
@@ -121,7 +122,7 @@ class FakeRestaurantApi implements IRestaurantApi {
     return PageModel(
       currentPage: page,
       totalPages: totalPages,
-      restaurants: result as List<RestaurantModel>,
+      restaurants: result.whereType<RestaurantModel>().toList(),
     );
   }
 }
