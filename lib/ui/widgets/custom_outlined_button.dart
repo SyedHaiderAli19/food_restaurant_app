@@ -35,7 +35,7 @@ class CustomOutlinedButton extends StatelessWidget {
           overlayColor: Theme.of(context).colorScheme.secondary,
           side: BorderSide(width: 1.5, color: Colors.black),
         ),
-        icon: icon ?? SizedBox(),
+        icon: icon,
       ),
     );
   }

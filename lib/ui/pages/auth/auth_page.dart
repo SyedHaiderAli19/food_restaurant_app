@@ -106,7 +106,6 @@ class _AuthPageState extends State<AuthPage> {
         ..._emailAndPassword(),
         SizedBox(height: 30),
         CustomTextButton(
-          Colors.black,
           text: 'Sign In',
           size: Size(double.infinity, 54),
           onPressed: () {
@@ -190,7 +189,6 @@ class _AuthPageState extends State<AuthPage> {
         ..._emailAndPassword(),
         SizedBox(height: 30),
         CustomTextButton(
-          Colors.black,
           size: Size(double.infinity, 54),
           text: 'Sign Up',
           onPressed: () {

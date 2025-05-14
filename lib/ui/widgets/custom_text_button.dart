@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 class CustomTextButton extends StatelessWidget {
   final Color? color;
   final String text;
-  final Size size;
+  final Size? size;
   final void Function() onPressed;
-  const CustomTextButton(
-    this.color, {
+  const CustomTextButton({
     super.key,
+    this.color,
     required this.text,
-    required this.size,
+    this.size,
     required this.onPressed,
   });
 
+  @override
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -22,17 +23,13 @@ class CustomTextButton extends StatelessWidget {
         elevation: 0,
         shadowColor: Colors.black,
         overlayColor: Theme.of(context).colorScheme.secondary,
+        minimumSize: size,
       ),
-      child: Container(
-        width: size.width,
-        height: size.height,
-        alignment: Alignment.center,
-        child: Text(
-          text,
-          style: Theme.of(
-            context,
-          ).textTheme.labelSmall!.copyWith(fontSize: 18, color: Colors.white),
-        ),
+      child: Text(
+        text,
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall!.copyWith(fontSize: 18, color: Colors.white),
       ),
     );
   }

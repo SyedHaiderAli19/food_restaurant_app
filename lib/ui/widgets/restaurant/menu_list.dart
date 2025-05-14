@@ -71,7 +71,7 @@ class MenuList extends StatelessWidget {
               color: Colors.white,
             ),
             child: Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 20),
+              padding: const EdgeInsets.only(left: 20.0, right: 16, top: 20),
               child: Column(
                 children: [
                   Row(
@@ -108,16 +108,13 @@ class MenuList extends StatelessWidget {
                         onPressed: () {},
                         icon: Icon(Icons.add, color: Colors.black26),
                       ),
-
-                      Expanded(child: Container()),
-
-                      CustomTextButton(
-                        Theme.of(context).colorScheme.secondary,
-                        text: 'Add to Basket',
-                        size: Size(double.infinity, 45),
-                        onPressed: () {},
-                      ),
                     ],
+                  ),
+                  CustomTextButton(
+                    color: Theme.of(context).colorScheme.secondary,
+                    text: 'Add to Basket',
+                    size: Size(double.infinity, 45),
+                    onPressed: () {},
                   ),
                 ],
               ),
