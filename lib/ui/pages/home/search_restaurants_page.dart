@@ -4,6 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:food_restaurant_app/state_management/restaurant/restaurant_bloc.dart';
 import 'package:food_restaurant_app/state_management/restaurant/restaurant_event.dart';
 import 'package:food_restaurant_app/state_management/restaurant/restaurant_state.dart';
+import 'package:food_restaurant_app/ui/pages/search_restaurants/i_search_restaurants_page_adapter.dart';
 import 'package:food_restaurant_app/utils/utils.dart';
 import 'package:restaurant/restaurant.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -11,10 +12,12 @@ import 'package:transparent_image/transparent_image.dart';
 class SearchRestaurantsPage extends StatefulWidget {
   final RestaurantBloc restaurantBloc;
   final String searchQuery;
+  final ISearchRestaurantsPageAdapter adapter;
   const SearchRestaurantsPage({
     super.key,
     required this.restaurantBloc,
     required this.searchQuery,
+    required this.adapter,
   });
 
   @override
@@ -22,7 +25,7 @@ class SearchRestaurantsPage extends StatefulWidget {
 }
 
 class _SearchRestaurantsPageState extends State<SearchRestaurantsPage> {
-  late PageLoadedState currentState;
+  PageLoadedState? currentState;
   bool fetchMore = false;
   List<RestaurantModel> restaurants = [];
   final ScrollController scrollController = ScrollController();
@@ -38,18 +41,25 @@ class _SearchRestaurantsPageState extends State<SearchRestaurantsPage> {
 
   void onScrollListener() {
     scrollController.addListener(() {
-      if (scrollController.offset ==
+      if (currentState != null &&
+          scrollController.offset ==
               scrollController.position.maxScrollExtent &&
-          currentState.nextPage != null) {
+          currentState!.nextPage != null) {
         fetchMore = true;
         widget.restaurantBloc.add(
           FindRestaurantsEvent(
-            page: currentState.nextPage!,
+            page: currentState!.nextPage!,
             query: widget.searchQuery,
           ),
         );
       }
     });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -109,6 +119,10 @@ class _SearchRestaurantsPageState extends State<SearchRestaurantsPage> {
           );
         }
 
+        if (state is LoadingState && currentState == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
         if (currentState == null) {
           return Center(child: CircularProgressIndicator());
         }
@@ -122,39 +136,46 @@ class _SearchRestaurantsPageState extends State<SearchRestaurantsPage> {
     itemBuilder: (BuildContext context, index) {
       return index >= restaurants.length
           ? bottomLoader()
-          : ListTile(
-            leading: FadeInImage.memoryNetwork(
-              placeholder: kTransparentImage,
-              image: 'https://picsum.photos/250?image=9',
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-            ),
-
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  restaurants[index].name,
-                  style: Theme.of(context).textTheme.titleSmall,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
+          : GestureDetector(
+            onTap:
+                () => widget.adapter.onRestaurantSelected(
+                  context: context,
+                  restaurant: restaurants[index],
                 ),
+            child: ListTile(
+              leading: FadeInImage.memoryNetwork(
+                placeholder: kTransparentImage,
+                image: 'https://picsum.photos/250?image=9',
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              ),
 
-                RatingBarIndicator(
-                  rating: 4.5,
-                  itemBuilder:
-                      (BuildContext context, index) =>
-                          Icon(Icons.star, color: Colors.amber),
-                  itemSize: 25,
-                ),
-              ],
-            ),
-            subtitle: Text(
-              '${restaurants[index].address.street}, ${restaurants[index].address.city}, ${restaurants[index].address.parish}',
-              softWrap: true,
-              maxLines: 2,
-              overflow: TextOverflow.clip,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    restaurants[index].name,
+                    style: Theme.of(context).textTheme.titleSmall,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
+                  ),
+
+                  RatingBarIndicator(
+                    rating: 4.5,
+                    itemBuilder:
+                        (BuildContext context, index) =>
+                            Icon(Icons.star, color: Colors.amber),
+                    itemSize: 25,
+                  ),
+                ],
+              ),
+              subtitle: Text(
+                '${restaurants[index].address.street}, ${restaurants[index].address.city}, ${restaurants[index].address.parish}',
+                softWrap: true,
+                maxLines: 2,
+                overflow: TextOverflow.clip,
+              ),
             ),
           );
     },

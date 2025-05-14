@@ -217,7 +217,14 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         itemBuilder: (BuildContext context, index) {
           return index >= restaurants.length
               ? bottomLoader()
-              : RestaurantListItem(restaurant: restaurants[index]);
+              : GestureDetector(
+                onTap:
+                    () => widget.adapter.onRestaurantSelected(
+                      context: context,
+                      restaurant: restaurants[index],
+                    ),
+                child: RestaurantListItem(restaurant: restaurants[index]),
+              );
         },
         physics: BouncingScrollPhysics(),
         itemCount:
