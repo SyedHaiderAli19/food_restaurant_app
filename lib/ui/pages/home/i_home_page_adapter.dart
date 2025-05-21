@@ -7,13 +7,19 @@ abstract class IHomePageAdapter {
     required BuildContext context,
     required RestaurantModel restaurant,
   });
+  void onUserLogout(BuildContext context);
 }
 
 class HomePageAdapter implements IHomePageAdapter {
   final Widget Function(RestaurantModel restaurant) onSelection;
   final Widget Function(String query) onSearch;
+  final Widget Function() onLogout;
 
-  HomePageAdapter({required this.onSelection, required this.onSearch});
+  HomePageAdapter({
+    required this.onSelection,
+    required this.onSearch,
+    required this.onLogout,
+  });
 
   @override
   void onSearchQuery({required BuildContext context, required String query}) {
@@ -30,5 +36,14 @@ class HomePageAdapter implements IHomePageAdapter {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => onSelection(restaurant)));
+  }
+
+  @override
+  void onUserLogout(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => onLogout()),
+      (Route<dynamic> route) => false,
+    );
   }
 }

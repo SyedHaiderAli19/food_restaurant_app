@@ -1,3 +1,4 @@
+// ignore: depend_on_referenced_packages
 import 'package:faker/faker.dart' as ff;
 import 'package:restaurant/restaurant.dart';
 
@@ -13,6 +14,7 @@ class FakeRestaurantApi implements IRestaurantApi {
         id: index.toString(),
         name: faker.company.name(),
         type: faker.food.cuisine(),
+        rating: 0.0,
         displayImageUrl: faker.internet.httpUrl(),
         address: AddressModel(
           zone: "",
@@ -27,7 +29,7 @@ class FakeRestaurantApi implements IRestaurantApi {
       ),
     );
 
-    _restaurants.forEach((restaurant) {
+    for (var restaurant in _restaurants) {
       var menus = List.generate(
         faker.randomGenerator.integer(5),
         (index) => MenuModel(
@@ -48,7 +50,7 @@ class FakeRestaurantApi implements IRestaurantApi {
         ),
       );
       _restaurantMenus.addAll(menus);
-    });
+    }
   }
 
   @override
@@ -101,6 +103,7 @@ class FakeRestaurantApi implements IRestaurantApi {
     required int pageNo,
   }) async {
     final filter =
+        // ignore: unnecessary_null_comparison
         location != null
             ? (RestaurantModel? res) => res!.location == location
             : null;

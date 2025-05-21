@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:food_restaurant_app/composition_root.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  CompositionRoot.configure();
-  runApp(const MyApp());
+  await CompositionRoot.configure();
+  final screenToShow = await CompositionRoot.start();
+  runApp(MyApp(startPage: screenToShow));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget startPage;
+  const MyApp({super.key, required this.startPage});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.montserratTextTheme(Theme.of(context).textTheme),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: CompositionRoot.composeHomeUI(),
+      home: startPage,
     );
   }
 }

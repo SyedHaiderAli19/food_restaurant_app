@@ -19,3 +19,4 @@ String doubleToCurrency(double value) {
   );
   return formatter.format(value);
 }
+

@@ -17,23 +17,25 @@ class MenuModel {
 
   static MenuModel fromJson(Map<String, dynamic> json) {
     return MenuModel(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      displayImageUrl: json['image_url'],
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      displayImageUrl: json['imageUrl']?.toString() ?? '',
       items:
-          json['items'] != null
-              ? (json['items'] as List<dynamic>)
-                  .map<MenuItemModel>(
-                    (item) => MenuItemModel(
-                      name: item['name'],
-                      description: item['description'],
-                      imageUrl: item['image_url'],
-                      unitPrice: item['unit_price'],
-                    ),
-                  )
-                  .toList()
-              : <MenuItemModel>[],
+          (json['items'] as List<dynamic>? ?? []).map<MenuItemModel>((item) {
+            return MenuItemModel(
+              name: item['name']?.toString() ?? '',
+              description: item['description']?.toString() ?? '',
+              imageUrl:
+                  (item['imageUrls'] as List<dynamic>? ?? [])
+                      .map((e) => e.toString())
+                      .toList(),
+              unitPrice:
+                  (item['unitPrice'] is num)
+                      ? (item['unitPrice'] as num).toDouble()
+                      : 0.0,
+            );
+          }).toList(),
     );
   }
 }

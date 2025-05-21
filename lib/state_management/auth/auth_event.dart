@@ -5,7 +5,15 @@ abstract class AuthEvent {}
 
 class SignInEvent extends AuthEvent {
   final AuthServiceContract authService;
-  SignInEvent({required this.authService});
+  final String? email;
+  final String? password;
+  final AuthType type;
+  SignInEvent({
+    required this.authService,
+    required this.type,
+    this.email,
+    this.password,
+  });
 }
 
 class SignOutEvent extends AuthEvent {

@@ -49,7 +49,7 @@ class AuthApi implements AuthApiContract {
 
   @override
   Future<Result<bool>> signOut(TokenModel token) async {
-    Uri endPoint = Uri.parse(('$baseUrl + auth/signout'));
+    Uri endPoint = Uri.parse(('$baseUrl/auth/signout'));
     Map<String, String> headers = {
       "Content-type": "application/json",
       "Authorization": token.value,

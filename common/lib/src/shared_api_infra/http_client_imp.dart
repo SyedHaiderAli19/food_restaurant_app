@@ -8,9 +8,18 @@ class HttpClientImp implements IHttpClient {
 
   @override
   Future<HttpResult> get(Uri url, {Map<String, String>? headers}) async {
-    final response = await client.get(url);
-
-    return HttpResult(data: response.body, status: _setStatus(response));
+    try {
+      final response = await client.get(url, headers: headers);
+      return HttpResult(
+        data: response.body,
+        status: _setStatus(response.statusCode),
+      );
+    } catch (e) {
+      return HttpResult(
+        data: '{"error": "Network error"}',
+        status: Status.failure,
+      );
+    }
   }
 
   @override
@@ -19,15 +28,23 @@ class HttpClientImp implements IHttpClient {
     String body, {
     Map<String, String>? headers,
   }) async {
-    final response = await client.post(url, body: body);
-
-    return HttpResult(data: response.body, status: _setStatus(response));
+    try {
+      final response = await client.post(url, body: body, headers: headers);
+      return HttpResult(
+        data: response.body,
+        status: _setStatus(response.statusCode),
+      );
+    } catch (e) {
+      return HttpResult(
+        data: '{"error": "Network error"}',
+        status: Status.failure,
+      );
+    }
   }
 
-  Status _setStatus(http.Response response) {
-    if (response.statusCode != 200) {
-      return Status.failure;
-    }
-    return Status.success;
+  Status _setStatus(int statusCode) {
+    return (statusCode >= 200 && statusCode < 300)
+        ? Status.success
+        : Status.failure;
   }
 }

@@ -51,7 +51,7 @@
     "common/LICENSE": true,
     "common/pubspec.lock": true,
     "common/README.md": true,
-    "auth": true
+    "coverage": true
   },
   "editor.dragAndDrop": false,
   "scm.compactFolders": true,

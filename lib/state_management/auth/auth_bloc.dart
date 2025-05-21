@@ -21,23 +21,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     //Initial Loading State
     emit(LoadingState());
 
-    //use case
-    final result = await event.authService.signIn();
+    if (event.authService is EmailAuth) {
+      final emailAuth = event.authService as EmailAuth;
+
+      emailAuth.credential(email: event.email!, password: event.password!);
+    }
+
+    //signin use case
+    final Result<TokenModel> result = await event.authService.signIn();
 
     //incase of success emit(AuthSuccessState(tokenModel)) or ErrorState
-    _setResultOfAuthState(emit, result);
+    _setResultOfAuthState(emit, result, authType: event.type);
   }
 
   void _setResultOfAuthState(
     Emitter<AuthState> emit,
-    Result<TokenModel> result,
-  ) {
+    Result<TokenModel> result, {
+    AuthType? authType,
+  }) {
     if (result.asError != null) {
       //if error occurs emit the error state
       emit(ErrorState(errorMessage: result.asError!.error.toString()));
       return;
     }
+
     //Emit SuccessState and return the token
+    localStore.save(result.asValue!.value);
+    localStore.saveAuthType(authType!);
     emit(AuthSuccessState(result.asValue!.value));
   }
 
@@ -53,6 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final token = await localStore.fetch();
 
     final result = await event.authService.signOut(token!);
+    
     if (result.asValue!.value) {
       //if the result value is present and is returned true incase of successful signout, then
       localStore.delete(

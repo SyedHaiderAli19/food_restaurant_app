@@ -55,7 +55,8 @@ class GoogleAuth implements AuthServiceContract {
     try {
       _currentUser = await _googleSignIn!.signIn();
     } catch (e) {
-      return;
+      print(e.toString());
+      return Result.error(e);
     }
   }
 }

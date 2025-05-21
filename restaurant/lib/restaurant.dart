@@ -7,3 +7,4 @@ export './src/api/i_restaurant_api.dart';
 export './src/domain/location_model.dart';
 export './src/domain/address_model.dart';
 export './src/domain/menu_item_model.dart';
+export './src/api/restaurant_api.dart';

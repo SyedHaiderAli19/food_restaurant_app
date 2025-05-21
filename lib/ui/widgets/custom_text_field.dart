@@ -3,24 +3,24 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatelessWidget {
   final String hint;
   final TextInputType keyboardType;
-  final bool isPassword;
+  final bool? isPassword;
   final double fontSize;
   final FontWeight fontWeight;
   final double height;
   final TextInputAction inputAction;
   final void Function(String val) onChanged;
-  final void Function(String query) onSubmitted;
+  final void Function(String query)? onSubmitted;
   const CustomTextField({
     super.key,
     required this.hint,
     required this.keyboardType,
-    required this.isPassword,
+    this.isPassword,
     required this.fontSize,
     required this.fontWeight,
     required this.height,
     required this.inputAction,
     required this.onChanged,
-    required this.onSubmitted,
+    this.onSubmitted,
   });
 
   final _border = const OutlineInputBorder(
@@ -46,7 +46,7 @@ class CustomTextField extends StatelessWidget {
         textInputAction: inputAction,
         onSubmitted: onSubmitted,
         keyboardType: keyboardType,
-        obscureText: isPassword,
+        obscureText: isPassword ?? false,
         onChanged: onChanged,
         cursorColor: Colors.black,
         style: Theme.of(context).textTheme.displaySmall!.copyWith(

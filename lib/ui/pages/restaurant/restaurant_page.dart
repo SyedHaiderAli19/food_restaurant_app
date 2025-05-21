@@ -50,7 +50,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.shopping_basket_outlined),
+            icon: Icon(Icons.shopping_basket_outlined, color: Colors.white),
             iconSize: 30,
           ),
         ],
@@ -84,129 +84,142 @@ class _RestaurantPageState extends State<RestaurantPage> {
           );
         }
 
-        if (state is MenuLoadedState) {
-          menus.addAll(state.menus);
+        if (state is MenuLoadedState && state.menus.isNotEmpty) {
+          return buildMenuList(state.menus);
         }
-
-        return buildMenuList();
+        return Center(
+          child: Text(
+            'No Menu Available',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+        );
       },
     ),
   );
 
-  buildMenuList() => DefaultTabController(
-    length: menus.length,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TabBar(
-          tabs: menus.map<Widget>((menu) => Tab(text: menu.name)).toList(),
-          isScrollable: true,
-          labelColor: Colors.orange,
-          indicatorSize: TabBarIndicatorSize.label,
-          unselectedLabelColor: Colors.black26,
-          unselectedLabelStyle: Theme.of(context).textTheme.titleSmall,
-          labelStyle: Theme.of(
-            context,
-          ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
-        ),
-        Expanded(
-          child: TabBarView(
-            children:
-                menus
-                    .map<Widget>((menu) => MenuList(menuItems: menu.items))
-                    .toList(),
+  Widget buildMenuList(List<MenuModel> menus) {
+    return DefaultTabController(
+      length: menus.length,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TabBar(
+            tabAlignment: TabAlignment.start,
+            automaticIndicatorColorAdjustment: true,
+            tabs: menus.map<Widget>((menu) => Tab(text: menu.name)).toList(),
+            isScrollable: true,
+            labelColor: Colors.orange,
+            indicatorSize: TabBarIndicatorSize.label,
+            unselectedLabelColor: Colors.black26,
+            unselectedLabelStyle: Theme.of(context).textTheme.titleSmall,
+            labelStyle: Theme.of(
+              context,
+            ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
           ),
-        ),
-      ],
-    ),
-  );
+          Expanded(
+            child: TabBarView(
+              children:
+                  menus
+                      .map<Widget>(
+                        (menu) => MenuList(menuItems: menu.items, menu: menu),
+                      )
+                      .toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  header() => FractionallySizedBox(
-    heightFactor: 0.48,
-    child: Stack(
-      children: [
-        FadeInImage.memoryNetwork(
-          placeholder: kTransparentImage,
-          image: 'https://picsum.photos/250?image=9',
-          height: 350,
-          width: double.infinity,
-          fit: BoxFit.cover,
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Container(
-              height: 170,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border.all(),
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context).colorScheme.secondary,
-                    blurRadius: 4,
-                    offset: const Offset(4, 4),
-                  ),
-                ],
-                color: Colors.white,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      top: 12,
+  header() {
+    final double rating =
+        (widget.restaurant.rating * 100).roundToDouble() / 100;
+    return FractionallySizedBox(
+      heightFactor: 0.48,
+      child: Stack(
+        children: [
+          FadeInImage.memoryNetwork(
+            placeholder: kTransparentImage,
+            image: widget.restaurant.displayImageUrl,
+            height: 350,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+          Align(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: Container(
+                height: 170,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.secondary,
+                      blurRadius: 4,
+                      offset: const Offset(4, 4),
                     ),
-                    child: Text(
-                      widget.restaurant.name,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: true,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                  ),
-
-                  SizedBox(height: 12),
-                  FractionallySizedBox(
-                    widthFactor: 0.7,
-                    child: Text(
-                      '${widget.restaurant.address.street}, ${widget.restaurant.address.city}, ${widget.restaurant.address.parish}',
-                      softWrap: true,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.clip,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleSmall!.copyWith(color: Colors.black54),
-                    ),
-                  ),
-
-                  SizedBox(height: 8),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      RatingBarIndicator(
-                        rating: 4.5,
-                        itemBuilder:
-                            (context, index) =>
-                                Icon(Icons.star, color: Colors.amber),
-                        itemCount: 5,
-                        itemSize: 30,
-                        direction: Axis.horizontal,
+                  ],
+                  color: Colors.white,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 12,
                       ),
-                      Text(
-                        '4.5',
-                        style: Theme.of(context).textTheme.labelLarge,
+                      child: Text(
+                        widget.restaurant.name,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+
+                    SizedBox(height: 12),
+                    FractionallySizedBox(
+                      widthFactor: 0.7,
+                      child: Text(
+                        '${widget.restaurant.address.street}, ${widget.restaurant.address.city}, ${widget.restaurant.address.parish}',
+                        softWrap: true,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.clip,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleSmall!.copyWith(color: Colors.black54),
+                      ),
+                    ),
+
+                    SizedBox(height: 8),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        RatingBarIndicator(
+                          rating: rating,
+                          itemBuilder:
+                              (context, index) =>
+                                  Icon(Icons.star, color: Colors.amber),
+                          itemCount: 5,
+                          itemSize: 30,
+                          direction: Axis.horizontal,
+                        ),
+                        Text(
+                          rating.toString(),
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }

@@ -1,3 +1,4 @@
+// ignore: implementation_imports
 import 'package:async/src/result/result.dart';
 import 'package:auth/src/domain/auth_service_contract.dart';
 import 'package:auth/src/domain/credential_model.dart';
@@ -7,7 +8,6 @@ import 'package:auth/src/infra/api/auth_api_contract.dart';
 class EmailAuth implements AuthServiceContract {
   final AuthApiContract api;
   CredentialModel? _credential;
-  TokenModel? _tokenModel;
 
   EmailAuth({required this.api});
 
@@ -21,9 +21,11 @@ class EmailAuth implements AuthServiceContract {
 
   @override
   Future<Result<TokenModel>> signIn() async {
-    assert(_credential != null);
+    if (_credential == null) {
+      return Result.error('Missing email or password');
+    }
 
-    var result = await api.signIn(_credential!);
+    final result = await api.signIn(_credential!);
 
     if (result.isError) {
       return result.asError!;
@@ -34,7 +36,6 @@ class EmailAuth implements AuthServiceContract {
 
   @override
   Future<Result<bool>> signOut(TokenModel token) async {
-    return await api.signOut(_tokenModel!);
+    return await api.signOut(token);
   }
-
 }

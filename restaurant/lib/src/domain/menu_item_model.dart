@@ -15,8 +15,25 @@ class MenuItemModel {
     return MenuItemModel(
       name: json['name'] ?? '',
       description: json['description'] ?? '',
-      unitPrice: (json['unit_price'] as num).toDouble(),
-      imageUrl: List<String>.from(json['image_url'] ?? []),
+      unitPrice: _parseUnitPrice(json['unitPrice']),
+      imageUrl: _parseImageUrls(json['imageUrls']),
     );
+  }
+
+  static double _parseUnitPrice(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    }
+    return 0.0;
+  }
+
+  static List<String> _parseImageUrls(dynamic value) {
+    if (value is List) {
+      return value
+          .map((e) => e?.toString() ?? '')
+          .where((e) => e.isNotEmpty)
+          .toList();
+    }
+    return [];
   }
 }

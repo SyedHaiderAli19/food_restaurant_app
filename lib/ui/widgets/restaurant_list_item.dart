@@ -8,6 +8,7 @@ class RestaurantListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double rating = (restaurant.rating * 100).roundToDouble() / 100;
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
       child: Container(
@@ -25,8 +26,9 @@ class RestaurantListItem extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 16),
+
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 16),
               child: Text(
@@ -54,7 +56,7 @@ class RestaurantListItem extends StatelessWidget {
             SizedBox(height: 8),
 
             RatingBarIndicator(
-              rating: 4.5,
+              rating: rating,
               itemBuilder:
                   (context, index) =>
                       Icon(Icons.star_rate_sharp, color: Colors.amber),
@@ -62,31 +64,12 @@ class RestaurantListItem extends StatelessWidget {
               itemSize: 50,
             ),
 
-            Text('4.5', style: Theme.of(context).textTheme.headlineSmall),
-
-            SizedBox(height: 8),
-
-            Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              children: [
-                createChip(label: 'Vegetarian', context: context),
-                createChip(label: 'Vegan', context: context),
-              ],
+            Text(
+              rating.toString(),
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  createChip({required String label, required BuildContext context}) {
-    return Chip(
-      label: Text(
-        label,
-        style: Theme.of(
-          context,
-        ).textTheme.labelLarge!.copyWith(color: Colors.white),
       ),
     );
   }

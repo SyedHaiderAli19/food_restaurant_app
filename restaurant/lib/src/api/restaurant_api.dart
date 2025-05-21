@@ -19,7 +19,7 @@ class RestaurantApi implements IRestaurantApi {
     required String searchTerm,
   }) async {
     final Uri endPoint = Uri.parse(
-      "$baseUrl/search/page=$pageNo&limit=$limit&term=$searchTerm",
+      "$baseUrl/restaurant/search?page=$pageNo&limit=$limit&query=$searchTerm",
     );
 
     final HttpResult result = await httpClient.get(endPoint);
@@ -33,7 +33,7 @@ class RestaurantApi implements IRestaurantApi {
     required int limit,
   }) async {
     final Uri endPoint = Uri.parse(
-      "$baseUrl/restaurants/page=$pageNo&limit=$limit",
+      "$baseUrl/restaurant/?page=$pageNo&limit=$limit",
     );
     final result = await httpClient.get(endPoint);
 
@@ -42,7 +42,7 @@ class RestaurantApi implements IRestaurantApi {
 
   @override
   Future<RestaurantModel?> getRestaurant({required String id}) async {
-    final Uri endPoint = Uri.parse("$baseUrl/restaurants/$id");
+    final Uri endPoint = Uri.parse("$baseUrl/restaurant/restaurant/$id");
     final result = await httpClient.get(endPoint);
 
     if (result.status == Status.failure) {
@@ -61,7 +61,7 @@ class RestaurantApi implements IRestaurantApi {
     required LocationModel location,
   }) async {
     final Uri endPoint = Uri.parse(
-      "$baseUrl/restaurants/page=$pageNo&limit=$limit&longitude=${location.longitude}&latitude=${location.latitude}",
+      "$baseUrl/restaurant/location?page=$pageNo&limit=$limit&longitude=${location.longitude}&latitude=${location.latitude}",
     );
     final result = await httpClient.get(endPoint);
 
@@ -73,7 +73,7 @@ class RestaurantApi implements IRestaurantApi {
     required String restaurantId,
   }) async {
     final Uri endPoint = Uri.parse(
-      "$baseUrl/restaurant/menu/restaurantId=$restaurantId",
+      "$baseUrl/restaurant/restaurant/menu/$restaurantId",
     );
     final HttpResult result = await httpClient.get(endPoint);
     try {
@@ -103,34 +103,52 @@ class RestaurantApi implements IRestaurantApi {
   PageModel? _parseRestaurantsJson(HttpResult result) {
     try {
       if (result.status == Status.failure) {
+        print('[RestaurantApi] Failed HTTP call');
         return null;
       }
 
       final Map<String, dynamic> json = jsonDecode(result.data);
+      print('[RestaurantApi] Raw JSON decoded successfully');
 
-      final List<RestaurantModel> restaurants =
-          json['restaurants'] != null ? _restaurantsFromJson(json) : [];
+      if (json['restaurants'] == null || json['metadata'] == null) {
+        print('[RestaurantApi] Missing restaurants or metadata in JSON');
+        return null;
+      }
+
+      final restaurants = _restaurantsFromJson(json);
+
+      final currentPage = json['metadata']['page'];
+      final totalPages = json['metadata']['total_pages'];
+
+      if (currentPage == null || totalPages == null) {
+        print('[RestaurantApi] Invalid pagination metadata');
+        return null;
+      }
 
       return PageModel(
-        currentPage: json['metadata']['page'],
-        totalPages: json['metadata']['total_pages'],
+        currentPage: currentPage,
+        totalPages: totalPages,
         restaurants: restaurants,
-      ); 
-    } catch (e) {
-      print(e.toString());
+      );
+    } catch (e, stack) {
+      print('[RestaurantApi] Parsing error: $e');
+      print(stack);
       return null;
     }
   }
 
   List<RestaurantModel> _restaurantsFromJson(Map<String, dynamic> json) {
     final List<dynamic> rawRestaurantsData = json['restaurants'];
+    final List<RestaurantModel> restaurants = [];
 
-    final List<RestaurantModel> restaurants =
-        rawRestaurantsData
-            .map<RestaurantModel>(
-              (element) => RestaurantModel.fromJson(element),
-            )
-            .toList();
+    for (var i = 0; i < rawRestaurantsData.length; i++) {
+      try {
+        final restaurant = RestaurantModel.fromJson(rawRestaurantsData[i]);
+        restaurants.add(restaurant);
+      } catch (e) {
+        print('[RestaurantApi] Failed to parse restaurant at index $i: $e');
+      }
+    }
 
     return restaurants;
   }

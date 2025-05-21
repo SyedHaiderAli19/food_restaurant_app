@@ -105,6 +105,9 @@ class _SearchRestaurantsPageState extends State<SearchRestaurantsPage> {
       bloc: widget.restaurantBloc,
       builder: (BuildContext context, RestaurantState state) {
         if (state is PageLoadedState) {
+          print(
+            'Restaurants returned after search ======= ${state.restaurants}',
+          );
           currentState = state;
           fetchMore = false;
           restaurants.addAll(state.restaurants);
@@ -114,7 +117,7 @@ class _SearchRestaurantsPageState extends State<SearchRestaurantsPage> {
           return Center(
             child: Text(
               state.errorMessage,
-              style: Theme.of(context).textTheme.displayLarge,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           );
         }
@@ -145,7 +148,7 @@ class _SearchRestaurantsPageState extends State<SearchRestaurantsPage> {
             child: ListTile(
               leading: FadeInImage.memoryNetwork(
                 placeholder: kTransparentImage,
-                image: 'https://picsum.photos/250?image=9',
+                image: restaurants[index].displayImageUrl,
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
@@ -162,7 +165,7 @@ class _SearchRestaurantsPageState extends State<SearchRestaurantsPage> {
                   ),
 
                   RatingBarIndicator(
-                    rating: 4.5,
+                    rating: (restaurants[index].rating * 100).roundToDouble()/100,
                     itemBuilder:
                         (BuildContext context, index) =>
                             Icon(Icons.star, color: Colors.amber),

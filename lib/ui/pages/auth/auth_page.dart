@@ -1,3 +1,4 @@
+import 'package:auth/auth.dart';
 import 'package:auth/src/domain/signup_service_contract.dart';
 import 'package:auth/src/infra/managers/auth_manager.dart';
 import 'package:flutter/gestures.dart';
@@ -8,16 +9,19 @@ import 'package:food_restaurant_app/models/user_model.dart';
 import 'package:food_restaurant_app/state_management/auth/auth_bloc.dart';
 import 'package:food_restaurant_app/state_management/auth/auth_event.dart';
 import 'package:food_restaurant_app/state_management/auth/auth_state.dart';
+import 'package:food_restaurant_app/ui/pages/auth/auth_page_adapter.dart';
 import 'package:food_restaurant_app/ui/widgets/custom_outlined_button.dart';
 import 'package:food_restaurant_app/ui/widgets/custom_text_button.dart';
 import 'package:food_restaurant_app/ui/widgets/custom_text_field.dart';
 
 class AuthPage extends StatefulWidget {
   final AuthManager manager;
+  final IAuthPageAdapter adapter;
   final SignupServiceContract signupService;
   const AuthPage({
     super.key,
     required this.manager,
+    required this.adapter,
     required this.signupService,
   });
 
@@ -30,44 +34,63 @@ class _AuthPageState extends State<AuthPage> {
   String _userName = '';
   String _email = '';
   String _password = '';
+  AuthServiceContract? authService;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 110),
-              child: _buildLogo(),
-            ),
-            SizedBox(height: 50),
-            BlocConsumer<AuthBloc, AuthState>(
-              builder: (_, state) {
-                return _buildUI();
-              },
-              listener: (context, state) {
-                if (state is LoadingState) {
-                  _showLoader();
-                }
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 110),
+                child: _buildLogo(),
+              ),
+              SizedBox(height: 50),
+              BlocConsumer<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  return _buildUI();
+                },
+                listener: (context, state) {
+                  if (state is LoadingState) {
+                    _showLoader();
+                  }
 
-                if (state is ErrorState) {
-                  //Incase of error state
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        state.errorMessage,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                  if (state is AuthSuccessState) {
+                    _hideLoader();
+                    if (authService != null) {
+                      widget.adapter.onAuthSuccess(context, authService!);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.black,
+                          content: Text(
+                            "Auth Service Not Initialized",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                  if (state is ErrorState) {
+                    _hideLoader();
+                    //Incase of error state
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.black,
+                        content: Text(
+                          state.errorMessage,
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
                       ),
-                    ),
-                  );
-                }
-
-                _hideLoader();
-              },
-            ),
-          ],
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -91,7 +114,8 @@ class _AuthPageState extends State<AuthPage> {
     ),
   );
 
-  _buildUI() => Expanded(
+  _buildUI() => SizedBox(
+    height: 500,
     child: PageView(
       physics: NeverScrollableScrollPhysics(),
       controller: _controller,
@@ -106,15 +130,17 @@ class _AuthPageState extends State<AuthPage> {
         ..._emailAndPassword(),
         SizedBox(height: 30),
         CustomTextButton(
+          color: Colors.black,
           text: 'Sign In',
           size: Size(double.infinity, 54),
           onPressed: () {
+            authService = widget.manager.serviceContract(AuthType.email);
             BlocProvider.of<AuthBloc>(context).add(
               SignInEvent(
-                authService: widget.manager.email(
-                  email: _email,
-                  password: _password,
-                ),
+                authService: authService!,
+                type: AuthType.email,
+                email: _email,
+                password: _password,
               ),
             );
           },
@@ -122,9 +148,10 @@ class _AuthPageState extends State<AuthPage> {
         SizedBox(height: 30),
         CustomOutlinedButton(
           onPressed: () {
-            BlocProvider.of<AuthBloc>(
-              context,
-            ).add(SignInEvent(authService: widget.manager.google));
+            authService = widget.manager.serviceContract(AuthType.google);
+            BlocProvider.of<AuthBloc>(context).add(
+              SignInEvent(authService: authService!, type: AuthType.google),
+            );
           },
           text: 'Sign In With Google',
           size: Size(double.infinity, 50),
@@ -177,18 +204,17 @@ class _AuthPageState extends State<AuthPage> {
           hint: 'Username',
           inputAction: TextInputAction.next,
           keyboardType: TextInputType.name,
-          isPassword: false,
           fontSize: 18,
           fontWeight: FontWeight.normal,
           onChanged: (val) {
             _userName = val;
           },
-          onSubmitted: (query) {},
         ),
         SizedBox(height: 30),
         ..._emailAndPassword(),
         SizedBox(height: 30),
         CustomTextButton(
+          color: Colors.black,
           size: Size(double.infinity, 54),
           text: 'Sign Up',
           onPressed: () {
@@ -244,13 +270,11 @@ class _AuthPageState extends State<AuthPage> {
       hint: 'Email',
       inputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
-      isPassword: false,
       fontSize: 18.0,
       fontWeight: FontWeight.normal,
       onChanged: (val) {
         _email = val;
       },
-      onSubmitted: (query) {},
     ),
     SizedBox(height: 30),
     CustomTextField(
@@ -258,13 +282,12 @@ class _AuthPageState extends State<AuthPage> {
       isPassword: true,
       keyboardType: TextInputType.text,
       hint: 'Password',
-      inputAction: TextInputAction.go,
+      inputAction: TextInputAction.done,
       fontSize: 18.0,
       fontWeight: FontWeight.normal,
       onChanged: (val) {
         _password = val;
       },
-      onSubmitted: (query) {},
     ),
   ];
 

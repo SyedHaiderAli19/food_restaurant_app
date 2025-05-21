@@ -1,13 +1,15 @@
 import 'package:auth/auth.dart';
+import 'package:common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_restaurant_app/cache/i_local_store.dart';
 import 'package:food_restaurant_app/cache/local_store.dart';
-import 'package:food_restaurant_app/fake_restaurant_api.dart';
+import 'package:food_restaurant_app/decorators/secure_client.dart';
 import 'package:food_restaurant_app/state_management/auth/auth_bloc.dart';
 import 'package:food_restaurant_app/state_management/helpers/header_bloc.dart';
 import 'package:food_restaurant_app/state_management/restaurant/restaurant_bloc.dart';
 import 'package:food_restaurant_app/ui/pages/auth/auth_page.dart';
+import 'package:food_restaurant_app/ui/pages/auth/auth_page_adapter.dart';
 import 'package:food_restaurant_app/ui/pages/home/i_home_page_adapter.dart';
 import 'package:food_restaurant_app/ui/pages/home/restaurant_list_page.dart';
 import 'package:food_restaurant_app/ui/pages/home/search_restaurants_page.dart';
@@ -21,56 +23,82 @@ import 'package:http/http.dart' as http;
 class CompositionRoot {
   static late SharedPreferences sharedPreferences;
   static late ILocalStore localStore;
-  static late String baseUrl;
+  static String baseUrl = 'http://localhost:3000';
   static late http.Client client;
-  static late FakeRestaurantApi fakeApi = FakeRestaurantApi(50);
+  static late SecureClient secureClient;
+  static late RestaurantApi restaurantApi;
+  static late AuthManager manager;
+  static late AuthApiContract authApi;
+  static late AuthType? authType;
+  static late AuthServiceContract? authService;
 
   static Future<void> configure() async {
     sharedPreferences = await SharedPreferences.getInstance();
     localStore = LocalStore(sharedPreferences);
     client = http.Client();
-    baseUrl = 'http://localhost:3000';
+    secureClient = SecureClient(
+      client: HttpClientImp(client: client),
+      localStore: localStore,
+    );
+    restaurantApi = RestaurantApi(baseUrl: baseUrl, httpClient: secureClient);
+    authApi = AuthApi(baseUrl: baseUrl, client: client);
+    manager = AuthManager(api: authApi);
+    authType = await localStore.fetchAuthType();
+    authService = manager.serviceContract(authType);
   }
 
   static Widget composeAuthUI() {
-    AuthApiContract api = AuthApi(baseUrl: baseUrl, client: client);
-    AuthManager manager = AuthManager(api: api);
     AuthBloc authBloc = AuthBloc(localStore: localStore);
-    SignupServiceContract signUpService = SignUpService(api: api);
-
+    SignupServiceContract signUpService = SignUpService(api: authApi);
+    IAuthPageAdapter adapter = AuthPageAdapter(
+      onUserAuthenticated: composeHomeUI,
+    );
     return BlocProvider<AuthBloc>(
       create: (BuildContext context) => authBloc,
-      child: AuthPage(manager: manager, signupService: signUpService),
+      child: AuthPage(
+        manager: manager,
+        signupService: signUpService,
+        adapter: adapter,
+      ),
     );
   }
 
-  static Widget composeHomeUI() {
+  static Future<Widget> start() async {
+    final token = await localStore.fetch();
+    return token == null ? composeAuthUI() : composeHomeUI(authService!);
+  }
+
+  static Widget composeHomeUI(AuthServiceContract service) {
     RestaurantBloc restaurantBloc = RestaurantBloc(
-      api: fakeApi,
+      api: restaurantApi,
       defaultPageSize: 20,
     );
 
     IHomePageAdapter adapter = HomePageAdapter(
       onSearch: composeSearchRestaurantsPageWith,
       onSelection: composeRestaurantPageWith,
+      onLogout: composeAuthUI,
     );
+
+    AuthBloc authBloc = AuthBloc(localStore: localStore);
 
     return MultiBlocProvider(
       providers: [
         BlocProvider<RestaurantBloc>(
           create: (BuildContext context) => restaurantBloc,
         ),
+        BlocProvider<AuthBloc>(create: (BuildContext context) => authBloc),
         BlocProvider<HeaderBloc>(
           create: (BuildContext context) => HeaderBloc(),
         ),
       ],
-      child: RestaurantListPage(adapter: adapter),
+      child: RestaurantListPage(adapter: adapter, authService: authService),
     );
   }
 
   static Widget composeSearchRestaurantsPageWith(String query) {
     RestaurantBloc restaurantBloc = RestaurantBloc(
-      api: fakeApi,
+      api: restaurantApi,
       defaultPageSize: 10,
     );
     ISearchRestaurantsPageAdapter searchRestaurantsPageAdapter =
@@ -84,7 +112,7 @@ class CompositionRoot {
 
   static Widget composeRestaurantPageWith(RestaurantModel restaurant) {
     RestaurantBloc restaurantBloc = RestaurantBloc(
-      api: fakeApi,
+      api: restaurantApi,
       defaultPageSize: 10,
     );
 

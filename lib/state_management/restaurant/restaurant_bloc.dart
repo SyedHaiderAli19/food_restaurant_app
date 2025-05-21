@@ -65,6 +65,7 @@ class RestaurantBloc extends Bloc<RestaurantEvent, RestaurantState> {
       limit: limit,
       searchTerm: event.query,
     );
+
     searchResults == null ||
             searchResults
                 .restaurants
